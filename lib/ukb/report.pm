@@ -1,54 +1,10 @@
 package ukb::report;
 
 use Moose;
-use npg_tracking::util::types;
-use npg_qc::Schema;
-use npg_qc::autoqc::role::result;
 
 with qw/MooseX::Getopt/;
 
 our $VERSION = '0';
-
-Readonly::Scalar my $CLASS_FIELD             => q[__CLASS__];
-Readonly::Scalar my $SEQ_COMPOSITION_PK_NAME => q[id_seq_composition];
-Readonly::Scalar my $SLEEP_TIME              => 180;
-
-has 'id_run'  => ( is          => 'ro',
-                   isa         => 'ArrayRef[NpgTrackingRunId]',
-                   required    => 0,
-                   default     => sub {[]},
-                 );
-
-has 'lane'    => ( is          => 'ro',
-                   isa         => 'ArrayRef[NpgTrackingLaneNumber]',
-                   required    => 0,
-                   default     => sub {[]},
-                 );
-
-has 'schema' =>    ( isa        => 'npg_qc::Schema',
-                     metaclass  => 'NoGetopt',
-                     is         => 'ro',
-                     required   => 0,
-                     lazy_build => 1,
-                    );
-sub _build_schema {
-  return npg_qc::Schema->connect();
-}
-
-has '_schema_sources' => (isa        => 'ArrayRef',
-                          is         => 'ro',
-                          required   => 0,
-                          lazy_build => 1,
-                         );
-sub _build__schema_sources {
-  my $self = shift;
-  return [$self->schema()->sources()];
-}
-
-sub _schema_has_source {
-  my ($self, $source_name) = @_;
-  return any { $_ eq $source_name } @{$self->_schema_sources()};
-}
 
 sub print_report(){
     my $self = shift;
@@ -81,9 +37,7 @@ Overkill module for printing QC reports.
 
 =item Moose
 
-=item MooseX::StrictConstructor
-
-=item namespace::autoclean
+=item MooseX::GetOpt
 
 =back
 
